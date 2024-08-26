@@ -1,5 +1,16 @@
 version: 2.1
 
+parameters:
+  run_build:  # Boolean parameter to control running the build job
+    type: boolean
+    default: false
+  run_test:   # Boolean parameter to control running the test job
+    type: boolean
+    default: false
+  run_deploy: # Boolean parameter to control running the deploy job
+    type: boolean
+    default: false
+
 jobs:
   build:
     docker:
@@ -7,6 +18,7 @@ jobs:
     steps:
       - checkout
       - run: python main.py
+      when: << pipeline.parameters.run_build >>  # Run only if parameter is true
 
   test:
     docker:
@@ -14,15 +26,25 @@ jobs:
     steps:
       - checkout
       - run: python tests.py
+      when: << pipeline.parameters.run_test >>  # Run only if parameter is true
+
+  deploy:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - run: echo "Deploying to production server"
+      when: << pipeline.parameters.run_deploy >>  # Run only if parameter is true
 
 workflows:
-  build_and_test:
+  build_and_test_deploy:
     jobs:
-      - hold_approval:
-          type: approval # Approval step to manually trigger the entire workflow
-      - build:
-          requires:
-            - hold_approval
+      - build
       - test:
           requires:
             - build
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: main
