@@ -2,29 +2,18 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: build
 
+on:
+  push:
+    branches:
+      - '**'
+
 jobs:
-  build:
-    docker:
-      - image: cimg/python:3.11
+  python-build:
     steps:
       - name: checkout
         uses: cloudbees-io/checkout@v1
-      - name: run build
-        uses: cloudbees-io/checkout@v1
-        run: |
-          python main.py
-
-  test:
-    docker:
-      - image: cimg/python:3.11
-    steps:
-      - name: checkout
-        uses: cloudbees-io/checkout@v1
-      - name: run tests
-        uses: cloudbees-io/checkout@v1
-        run: |
-          python tests.py
-
-# You can define triggers here using CloudBees CI syntax (optional)
-# Refer to CloudBees CI documentation for supported triggers
-# ...
+      - name: scan
+        uses: cloudbees-io/sonarqube-bundled-sast-scan-code@v2
+        with:
+          language: LANGUAGE_PYTHON
+      
