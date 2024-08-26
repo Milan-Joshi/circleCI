@@ -8,11 +8,32 @@ on:
       - '**'
 
 jobs:
-  python-build:
+  build:
+    docker:
+      - image: cimg/python:3.11
     steps:
       - name: checkout
         uses: cloudbees-io/checkout@v1
-      - name: scan
-        uses: cloudbees-io/sonarqube-bundled-sast-scan-code@v2
-        with:
-          language: LANGUAGE_PYTHON
+      - name: run build
+        uses: cloudbees-io/checkout@v1
+        run: |
+          python main.py
+
+  test:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - name: checkout
+        uses: cloudbees-io/checkout@v1
+      - name: run tests
+        uses: cloudbees-io/checkout@v1
+        run: |
+          python tests.py
+
+workflows:
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
