@@ -20,8 +20,6 @@ jobs:
     steps:
       - name: checkout
         uses: cloudbees-io/checkout@v1
-      - name: Run Python tests
-        uses: cloudbees-io/checkout@v1
         run:
           python -m unittest discover tests
       
