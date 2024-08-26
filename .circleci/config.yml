@@ -18,11 +18,11 @@ jobs:
 workflows:
   build_and_test:
     jobs:
-      - build
+      - hold_approval:
+          type: approval # Approval step to manually trigger the entire workflow
+      - build:
+          requires:
+            - hold_approval
       - test:
           requires:
             - build
-      - hold_approval:
-          type: approval # Approval step to manually trigger next actions (if any)
-          requires:
-            - test
