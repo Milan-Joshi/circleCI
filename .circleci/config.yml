@@ -1,10 +1,10 @@
 version: 2.1
 
 parameters:
-  run_build:  # Boolean parameter to control running the build job
+  run_build:
     type: boolean
     default: false
-  run_test:   # Boolean parameter to control running the test job
+  run_test:
     type: boolean
     default: false
 
@@ -14,22 +14,31 @@ jobs:
       - image: cimg/python:3.11
     steps:
       - checkout
-      - run: python main.py
-    when: << pipeline.parameters.run_build >>
+      - when:
+          condition: << pipeline.parameters.run_build >>
+          steps:
+            - run: python main.py
 
-  test:  # New job definition indented further
+  test:
     docker:
       - image: cimg/python:3.11
     steps:
       - checkout
-      - run: python tests.py
-      when: << pipeline.parameters.run_test >>
+      - when:
+          condition: << pipeline.parameters.run_test >>
+          steps:
+            - run: python tests.py
 
 workflows:
-  build_and_test_deploy:  # We can keep the workflow name for future use
+  build_and_test:
     jobs:
-      - build
+      - build:
+          filters:
+            branches:
+              ignore: /.*/
       - test:
           requires:
             - build
-          # Removed the deploy job section
+          filters:
+            branches:
+              ignore: /.*/
