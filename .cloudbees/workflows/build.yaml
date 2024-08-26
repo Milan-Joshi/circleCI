@@ -2,11 +2,6 @@ apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: build
 
-on:
-  push:
-    branches:
-      - '**'
-
 jobs:
   build:
     docker:
@@ -30,10 +25,6 @@ jobs:
         run: |
           python tests.py
 
-workflows:
-  build_and_test:
-    jobs:
-      - build
-      - test:
-          requires:
-            - build
+# You can define triggers here using CloudBees CI syntax (optional)
+# Refer to CloudBees CI documentation for supported triggers
+# ...
