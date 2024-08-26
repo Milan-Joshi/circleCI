@@ -7,28 +7,22 @@ jobs:
     steps:
       - checkout
       - run: python main.py
+
   test:
     docker:
       - image: cimg/python:3.11
     steps:
       - checkout
       - run: python tests.py
-  deploy:
-    docker:
-      - image: cimg/python:3.11
-    steps:
-      - run: echo "Deploying to production server"
 
 workflows:
-  build_and_test_deploy:
+  build_and_test:
     jobs:
       - build
       - test:
           requires:
-            - build 
-      - deploy:
+            - build
+      - hold_approval:
+          type: approval # Approval step to manually trigger next actions (if any)
           requires:
             - test
-          filters:
-            branches:
-              only: main
