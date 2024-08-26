@@ -7,9 +7,6 @@ parameters:
   run_test:   # Boolean parameter to control running the test job
     type: boolean
     default: false
-  run_deploy: # Boolean parameter to control running the deploy job
-    type: boolean
-    default: false
 
 jobs:
   build:
@@ -18,33 +15,21 @@ jobs:
     steps:
       - checkout
       - run: python main.py
-      when: << pipeline.parameters.run_build >>  # Run only if parameter is true
+    when: << pipeline.parameters.run_build >>
 
-  test:
+  test:  # New job definition indented further
     docker:
       - image: cimg/python:3.11
     steps:
       - checkout
       - run: python tests.py
-      when: << pipeline.parameters.run_test >>  # Run only if parameter is true
-
-  deploy:
-    docker:
-      - image: cimg/python:3.11
-    steps:
-      - run: echo "Deploying to production server"
-      when: << pipeline.parameters.run_deploy >>  # Run only if parameter is true
+      when: << pipeline.parameters.run_test >>
 
 workflows:
-  build_and_test_deploy:
+  build_and_test_deploy:  # We can keep the workflow name for future use
     jobs:
       - build
       - test:
           requires:
             - build
-      - deploy:
-          requires:
-            - test
-          filters:
-            branches:
-              only: main
+          # Removed the deploy job section
